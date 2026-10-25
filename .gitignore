@@ -1,0 +1,32 @@
+# Python / build outputs
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+
+# Runtime data / caches
+news-monitor/data/
+news-monitor/models/
+news-monitor/static/vendor/vosk/model.tar.gz
+android-build/app/assets/www/vendor/vosk/model.tar.gz
+
+# Release binaries
+release/
+*.apk
+*.exe
+*.zip
+
+# Android build intermediates / local toolchain
+android-build/app/build/
+android-build/output/
+android-build/tooling/
+build-pyinstaller/
+*.spec
+
+# Local logs / secrets
+*.log
+.env
+.env.*

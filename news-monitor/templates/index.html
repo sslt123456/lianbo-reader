@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#b31722">
+  <meta name="description" content="每日央视《新闻联播》文字摘要、原片原声视频与 B 站 UP 联动简报，不使用 TTS 合成语音。">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="联播夜读">
+  <title>联播夜读 · 每日新闻联播联动简报</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23b31722'/%3E%3Ctext x='32' y='43' font-size='36' text-anchor='middle' fill='%23fff8ec' font-family='serif'%3E联%3C/text%3E%3C/svg%3E">
+  <link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/static/manifest.webmanifest">
+  <link rel="stylesheet" href="/static/style.css?v=20261020r">
+</head>
+<body>
+  <div class="paper-noise" aria-hidden="true"></div>
+  <div class="accent-line" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="联播夜读首页">
+      <span class="brand-mark">联</span>
+      <span class="brand-text">
+        <strong>联播夜读</strong>
+        <small>CCTV-1 · B站双UP</small>
+      </span>
+    </a>
+
+    <span class="monitor-pill" id="monitorPill">
+      <i class="dot"></i><span id="monitorText">监控启动中</span>
+    </span>
+
+    <div class="topbar-actions">
+      <div class="date-control">
+        <button class="icon-btn" id="prevDateBtn" title="上一条已收录日期" aria-label="上一条已收录日期">‹</button>
+        <label class="date-field">
+          <span class="sr-only">选择日期</span>
+          <input type="date" id="dateInput">
+        </label>
+        <button class="icon-btn" id="nextDateBtn" title="下一条已收录日期" aria-label="下一条已收录日期">›</button>
+        <button class="btn btn-quiet" id="loadDateBtn">载入</button>
+      </div>
+      <button class="btn btn-red" id="refreshBtn">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.34 5.66M20 5v6h-6"/></svg>
+        <span>立即抓取</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="page" id="page">
+    <section class="hero" id="hero" hidden>
+      <div class="hero-copy">
+        <div class="hero-kicker">
+          <span class="kicker">每日新闻联播 · 联动简报</span>
+          <span class="kicker-sep"></span>
+          <span class="hero-date" id="heroDate">10月18日</span>
+          <span class="hero-weekday" id="heroWeekday">星期日</span>
+          <span class="hero-channel">CCTV-1 · 19:00</span>
+          <span class="hero-episode" id="heroEpisodeTitle">《新闻联播》</span>
+        </div>
+        <h1 class="hero-headline" id="heroHeadline"></h1>
+        <p class="hero-overview" id="heroOverview"></p>
+        <div class="hero-meta" id="heroStats"></div>
+        <div class="chip-row" id="themeRow"></div>
+      </div>
+      <div class="hero-actions">
+        <button class="btn btn-red hero-cta" id="heroPlayBtn">
+          <span class="play-tri">▶</span>
+          <span>播放原片</span>
+        </button>
+        <button class="btn btn-quiet" id="jumpHighlights">先看重点</button>
+      </div>
+    </section>
+
+    <section class="highlights" id="highlights" hidden>
+      <div class="block-head">
+        <h3>今日重点</h3>
+        <span>自动选出的三条主线</span>
+      </div>
+      <div class="highlight-list" id="highlightList"></div>
+    </section>
+
+    <div class="layout" id="layout" hidden>
+      <section class="text-panel">
+        <header class="section-head">
+          <div>
+            <span class="eyebrow">文字板块</span>
+            <h2>今日解读</h2>
+          </div>
+          <span class="section-note">摘要 · 原稿 · UP观点</span>
+        </header>
+
+        <section class="linkage" id="linkageStrip">
+          <div class="block-head">
+            <h3>三方联动</h3>
+            <span>同一晚，三种读法</span>
+          </div>
+          <div class="linkage-list" id="linkageGrid"></div>
+        </section>
+
+        <section class="up-context" id="upContext" aria-label="UP 主素材"></section>
+
+        <section class="all-segments">
+          <div class="block-head">
+            <h3>全部条目</h3>
+            <span id="allSegmentsCount"></span>
+          </div>
+          <div class="segment-list" id="segmentList"></div>
+        </section>
+      </section>
+
+      <aside class="voice-panel" id="voicePanel">
+        <header class="voice-head">
+          <div>
+            <span class="eyebrow">原片视听</span>
+            <h2>《新闻联播》原片</h2>
+          </div>
+          <span class="voice-count" id="voiceCount"></span>
+        </header>
+
+        <div class="video-stage">
+          <video id="clipVideo" playsinline preload="metadata"></video>
+          <div class="video-empty" id="videoEmpty">
+            <div class="video-empty-icon">◉</div>
+            <p>选择一条原片<br>播放该条《新闻联播》的原声画面</p>
+          </div>
+          <div class="video-topline">
+            <span class="video-badge" id="videoBadge">原片待命</span>
+            <span class="video-quality" id="videoQuality"></span>
+          </div>
+          <div class="video-bottomline">
+            <button class="video-control" id="unmuteBtn" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5ZM16 9a4 4 0 0 1 0 6M19 6a8 8 0 0 1 0 12"/></svg>
+              <span>静音</span>
+            </button>
+            <button class="video-control" id="fullscreenBtn" type="button">全屏 ⛶</button>
+            <a class="video-control" id="clipSourceLink" href="#" target="_blank" rel="noopener">央视原片 ↗</a>
+          </div>
+        </div>
+
+        <div class="video-caption" id="videoCaption" hidden></div>
+
+        <div class="sync-control" aria-label="字幕同步">
+          <span>字幕同步</span>
+          <button type="button" id="syncMinusBtn">−0.2s</button>
+          <strong id="syncValue">0.0s</strong>
+          <button type="button" id="syncPlusBtn">+0.2s</button>
+          <button type="button" id="syncResetBtn">复位</button>
+          <span class="align-status" id="alignStatus"></span>
+        </div>
+        <div class="learn-control">
+          <button type="button" id="learnBtn">点句校准</button>
+          <button type="button" id="learnResetBtn">清除本段</button>
+          <span id="learnStatus"></span>
+          <span class="learn-hint" id="learnHint">播放/暂停时，点一下音频正在读的文字稿句子</span>
+        </div>
+
+        <div class="audio-card">
+          <div class="audio-now">
+            <div class="now-copy">
+              <span class="now-label">正在播放</span>
+              <p class="now-title" id="nowTitle">尚未开始</p>
+              <p class="now-meta" id="nowMeta">央视原片 · 原声画面 · 无 TTS</p>
+            </div>
+            <div class="waveform" id="waveform" aria-hidden="true"></div>
+          </div>
+          <div class="audio-progress">
+            <input type="range" id="audioSeek" min="0" max="1000" value="0" step="1" aria-label="原片进度">
+            <div class="time-row"><span id="timeNow">0:00</span><span id="timeTotal">0:00</span></div>
+          </div>
+          <div class="audio-controls">
+            <div class="transport">
+              <button class="round-btn" id="prevBtn" aria-label="上一条">⏮</button>
+              <button class="play-btn" id="mainPlayBtn" aria-label="播放或暂停">
+                <span class="play-glyph">▶</span>
+              </button>
+              <button class="round-btn" id="nextBtn" aria-label="下一条">⏭</button>
+            </div>
+            <div class="audio-status" id="audioStatus">
+              <span class="status-dot"></span><span>央视原片原声</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="playlist-head">
+          <div>
+            <h3>原片清单</h3>
+            <p id="playlistSub">共 14 段 · 点击播放央视原片</p>
+          </div>
+          <div class="playlist-tools">
+            <span class="playlist-badge">原片 · 无 TTS</span>
+          </div>
+        </div>
+
+        <div class="playlist" id="playlist"></div>
+
+        <div class="play-toggles">
+          <label><input type="checkbox" id="autoNext" checked><span>连续播放</span></label>
+          <span class="monitor-inline"><span class="dot"></span>每日 <span id="monitorTimeInline">19:35</span> 更新</span>
+        </div>
+      </aside>
+    </div>
+
+    <section class="sources-section" id="sourcesSection" hidden>
+      <details class="source-details">
+        <summary>
+          <span>数据来源与说明</span>
+          <em>央视网 · B站公开视频 · 原片原声</em>
+        </summary>
+        <div class="sources-grid" id="sourcesGrid"></div>
+        <p class="editor-note" id="editorNote"></p>
+      </details>
+    </section>
+
+    <section class="empty-state" id="emptyState" hidden>
+      <div class="empty-mark">联</div>
+      <h2>正在准备今晚的简报</h2>
+      <p id="emptyText">首次启动需要从央视网与 B站抓取当期内容，请稍候。</p>
+      <div class="empty-actions">
+        <button class="btn btn-red" id="emptyRefreshBtn">立即抓取</button>
+        <button class="btn btn-quiet" id="emptyReloadBtn">重新载入</button>
+      </div>
+    </section>
+
+    <section class="loading-state" id="loadingState">
+      <div class="ink-loader"><span></span><span></span><span></span></div>
+      <p id="loadingText">正在整理今日联播…</p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div>
+      <strong>联播夜读</strong>
+      <span>每日新闻联播 · 本地联动简报</span>
+    </div>
+    <div class="footer-meta">
+      <span>文字：央视网 / B站公开页面</span>
+      <span>音视频：原片原声 · 无 TTS</span>
+      <a class="footer-link" href="/mobile" target="_blank" rel="noopener">手机 / 平板访问 ↗</a>
+      <span id="footerTime"></span>
+    </div>
+  </footer>
+
+  <div class="toast-stack" id="toastStack" aria-live="polite"></div>
+
+  <div class="bili-modal" id="biliModal" hidden>
+    <div class="bili-shell">
+      <div class="bili-head">
+        <div>
+          <span class="bili-kicker">B 站原视频 · 原声</span>
+          <h3 id="biliTitle">UP 主原视频</h3>
+        </div>
+        <button class="bili-close" id="closeBiliBtn" type="button" aria-label="关闭">×</button>
+      </div>
+      <div class="bili-frame-wrap">
+        <iframe id="biliFrame" src="about:blank" allow="autoplay; fullscreen; encrypted-media" allowfullscreen referrerpolicy="no-referrer"></iframe>
+      </div>
+      <div class="bili-foot">
+        <a id="biliOpenLink" href="#" target="_blank" rel="noopener">在 B 站打开原视频 ↗</a>
+        <span id="biliMeta"></span>
+      </div>
+    </div>
+  </div>
+
+  <template id="segmentTemplate">
+    <article class="segment-card">
+      <div class="segment-index"></div>
+      <div class="segment-body">
+        <div class="segment-topline">
+          <div class="segment-meta"></div>
+        </div>
+        <h3 class="segment-title"></h3>
+        <p class="segment-summary"></p>
+        <div class="segment-take-inline"></div>
+        <div class="segment-detail">
+          <div class="segment-extra"></div>
+          <div class="segment-takes"></div>
+          <div class="segment-transcript"></div>
+          <div class="segment-source-row">
+            <a class="text-link segment-source" target="_blank" rel="noopener">查看央视原稿 ↗</a>
+            <span class="segment-timecode"></span>
+          </div>
+        </div>
+        <div class="segment-actions">
+          <button class="play-segment-btn" type="button">
+            <span class="mini-play">▶</span><span>播放这一段原片</span>
+          </button>
+          <button class="expand-segment-btn" type="button">展开详情</button>
+        </div>
+      </div>
+    </article>
+  </template>
+
+  <script src="/static/vendor/hls.min.js"></script>
+  <script src="/static/app.js?v=20261020r"></script>
+</body>
+</html>

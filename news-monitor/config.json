@@ -1,0 +1,43 @@
+{
+  "app_name": "联播夜读",
+  "port": 8766,
+  "host": "0.0.0.0",
+  "monitor_time": "19:35",
+  "default_voice": "zh-CN-YunyangNeural",
+  "voices": [
+    {
+      "id": "zh-CN-YunyangNeural",
+      "name": "云扬 · 男声",
+      "desc": "新闻播报感，默认音色"
+    },
+    {
+      "id": "zh-CN-XiaoxiaoNeural",
+      "name": "晓晓 · 女声",
+      "desc": "温和清晰，适合长听"
+    },
+    {
+      "id": "zh-CN-YunxiNeural",
+      "name": "云希 · 男声",
+      "desc": "年轻自然，语速轻快"
+    }
+  ],
+  "bilibili": {
+    "cache_ttl_hours": 4,
+    "ups": [
+      {
+        "name": "你好小谢同志",
+        "uid": 442799491,
+        "role": "每日逐条速览",
+        "accent": "#e46a76",
+        "alternate_queries": ["新闻联播极速版"]
+      },
+      {
+        "name": "原点公社",
+        "uid": 385654465,
+        "role": "周度政策复盘",
+        "accent": "#5b8c85",
+        "alternate_queries": ["新闻联播 一周复盘解读"]
+      }
+    ]
+  }
+}

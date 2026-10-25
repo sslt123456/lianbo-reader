@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#b31722">
+  <title>远程访问 · 联播夜读</title>
+  <link rel="icon" href="/static/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png">
+  <style>
+    :root {
+      --bg: #f6f3ec; --surface: #fffdf8; --ink: #1e242b; --muted: #7a766d; --faint: #a7a197;
+      --line: rgba(30, 36, 43, .12); --red: #b31722; --gold: #a77b3d;
+      --serif: "Source Han Serif SC", "Noto Serif CJK SC", "Songti SC", "SimSun", serif;
+      --sans: "PingFang SC", "Microsoft YaHei", sans-serif; --mono: "Cascadia Mono", "Consolas", monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; color: var(--ink); background:
+        radial-gradient(700px 380px at 6% -8%, rgba(179, 23, 34, .07), transparent 60%),
+        var(--bg);
+      font-family: var(--sans); font-size: 15px; line-height: 1.7;
+      padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+    }
+    a { color: inherit; }
+    .wrap { width: min(900px, calc(100% - 32px)); margin: 0 auto; padding: 25px 0 38px; }
+    .brand { display: flex; align-items: center; gap: 11px; text-decoration: none; }
+    .mark { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 9px 9px 9px 3px; background: var(--red); color: #fff8ec; font-family: var(--serif); font-size: 22px; }
+    .brand strong { display: block; font-family: var(--serif); font-size: 19px; letter-spacing: .12em; }
+    .brand small { display: block; color: var(--faint); font-size: 10px; letter-spacing: .06em; }
+    .hero { margin-top: 30px; }
+    .eyebrow { color: var(--red); font-size: 10px; font-weight: 700; letter-spacing: .18em; }
+    h1 { margin: 6px 0 7px; font-family: var(--serif); font-weight: 600; font-size: clamp(26px, 5vw, 38px); line-height: 1.3; }
+    .lead { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.8; max-width: 620px; }
+    .grid { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(250px, .92fr); gap: 20px; margin-top: 23px; align-items: start; }
+    .card { border: 1px solid var(--line); border-radius: 13px; background: var(--surface); padding: 19px; box-shadow: 0 8px 26px rgba(40, 32, 20, .045); }
+    .status { display: inline-flex; align-items: center; gap: 7px; padding: 4px 10px; border-radius: 999px; background: rgba(219, 231, 227, .5); color: #40655d; font-size: 11px; }
+    .status i { width: 6px; height: 6px; border-radius: 50%; background: #4f8a78; box-shadow: 0 0 0 3px rgba(79, 138, 120, .12); }
+    .status.off { background: rgba(239, 226, 200, .55); color: #765a2e; }
+    .status.off i { background: var(--gold); box-shadow: none; }
+    .url-box { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 14px; padding: 9px 11px; border-radius: 8px; background: #f4efe4; border: 1px dashed rgba(167, 123, 61, .35); }
+    .url-box code { flex: 1; min-width: 200px; color: #704e20; font-family: var(--mono); font-size: 11.5px; word-break: break-all; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-height: 36px; padding: 6px 12px; border-radius: 7px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); text-decoration: none; font-size: 12px; }
+    .btn-red { background: var(--red); border-color: var(--red); color: #fff8ec; }
+    .qr-card { text-align: center; }
+    .qr-card img { width: min(280px, 100%); border-radius: 8px; background: var(--surface); }
+    .qr-card p { margin: 8px 0 0; color: var(--muted); font-size: 11px; }
+    .steps { margin-top: 16px; padding-top: 2px; }
+    .step { display: flex; gap: 11px; padding: 9px 0; border-top: 1px solid var(--line); }
+    .step-no { flex: none; width: 21px; height: 21px; display: grid; place-items: center; border-radius: 50%; background: rgba(179, 23, 34, .08); color: var(--red); font-family: var(--mono); font-size: 9.5px; }
+    .step strong { display: block; font-size: 12.5px; }
+    .step p { margin: 1px 0 0; color: var(--muted); font-size: 11.5px; line-height: 1.7; }
+    .notice { margin-top: 14px; padding: 11px 13px; border-radius: 8px; background: rgba(239, 227, 204, .45); color: #6c5731; font-size: 11px; line-height: 1.75; }
+    .notice b { color: #5c431b; }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    code.cmd { font-family: var(--mono); font-size: 10.5px; background: #f4efe4; padding: 2px 5px; border-radius: 3px; }
+    .muted { color: var(--muted); font-size: 11.5px; }
+    footer { margin-top: 28px; padding-top: 13px; border-top: 1px solid var(--line); color: var(--faint); font-size: 10px; display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+    @media (max-width: 700px) {
+      .wrap { padding-top: 17px; }
+      .grid { grid-template-columns: 1fr; }
+      .qr-card { order: -1; }
+      .qr-card img { width: min(230px, 72vw); }
+      .card { padding: 15px; }
+      .url-box .btn { flex: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <a class="brand" href="/">
+      <span class="mark">联</span>
+      <span><strong>联播夜读</strong><small>远程访问 · 跨网络</small></span>
+    </a>
+
+    <section class="hero">
+      <span class="eyebrow">{{ '已开启' if remote_url else '未开启' }} · 公网 HTTPS 隧道</span>
+      <h1>{% if remote_url %}用手机随时随地<br>打开联播夜读{% else %}尚未开启远程访问{% endif %}</h1>
+      <p class="lead">
+        {% if remote_url %}
+        这个地址可以让手机、平板在任意网络（5G、公司 Wi-Fi、其他家庭网络）打开本机上的联播夜读。地址通过临时 HTTPS 隧道生成，电脑需要保持开机。
+        {% else %}
+        远程访问需要在运行本程序的电脑上启动一个临时 HTTPS 隧道。请双击项目目录中的 <code class="cmd">启动远程访问.bat</code>，成功后本页会显示二维码和公开地址。
+        {% endif %}
+      </p>
+    </section>
+
+    <div class="grid">
+      <section class="card">
+        <span class="status {{ '' if remote_url else 'off' }}"><i></i>{{ '远程访问运行中' if remote_url else '等待启动' }}</span>
+        {% if remote_url %}
+        <div class="url-box">
+          <code id="remoteUrl">{{ remote_url }}</code>
+          <button class="btn" type="button" onclick="navigator.clipboard && navigator.clipboard.writeText(document.getElementById('remoteUrl').textContent)">复制链接</button>
+          <a class="btn btn-red" href="{{ remote_url }}" target="_blank" rel="noopener">在电脑上打开</a>
+        </div>
+        <div class="steps">
+          <div class="step">
+            <span class="step-no">1</span>
+            <div><strong>用手机 / 平板扫码</strong><p>任意网络均可打开；若浏览器提示安全风险，确认继续访问即可。</p></div>
+          </div>
+          <div class="step">
+            <span class="step-no">2</span>
+            <div><strong>手机 Chrome 可添加到主屏幕</strong><p>进入页面后，Chrome 菜单 →「添加到主屏幕 / 安装应用」；支持安装的浏览器会显示「安装应用」。</p></div>
+          </div>
+          <div class="step">
+            <span class="step-no">3</span>
+            <div><strong>这个地址是临时隧道</strong><p>电脑关机、重启或隧道断开后 URL 会变化；重新运行启动脚本并重新扫码即可。</p></div>
+          </div>
+        </div>
+        <div class="notice">
+          <b>安全提示：</b>远程访问已启用随机访问密钥，链接不要随意公开。本程序只读取公开新闻内容；如果不需要远程访问，可运行 <code class="cmd">关闭远程访问.bat</code>。
+        </div>
+        {% else %}
+        <div class="steps">
+          <div class="step"><span class="step-no">1</span><div><strong>双击启动远程访问</strong><p>项目目录：<code class="cmd">启动远程访问.bat</code></p></div></div>
+          <div class="step"><span class="step-no">2</span><div><strong>等待二维码生成</strong><p>脚本会建立 localhost.run HTTPS 临时隧道并自动打开本页。</p></div></div>
+          <div class="step"><span class="step-no">3</span><div><strong>手机扫码</strong><p>任意网络打开，电脑保持开机即可一直访问。</p></div></div>
+        </div>
+        {% endif %}
+        <div class="actions">
+          <a class="btn" href="/mobile">局域网扫码方式</a>
+          <a class="btn" href="javascript:location.reload()">刷新状态</a>
+          {% if started_at %}<span class="muted" style="align-self:center">启动于 {{ started_at }}</span>{% endif %}
+        </div>
+      </section>
+
+      <aside class="card qr-card">
+        {% if qr %}
+        <img src="{{ qr }}" alt="手机扫描远程访问二维码">
+        <p>任意网络 · 手机 / 平板扫码</p>
+        {% else %}
+        <div style="padding:40px 10px;color:var(--faint);font-size:12px">
+          <div style="font-size:32px;color:#d9c6a8;margin-bottom:8px">▣</div>
+          启动远程访问后<br>这里会出现二维码
+        </div>
+        {% endif %}
+      </aside>
+    </div>
+
+    <footer>
+      <span>联播夜读 · 远程访问</span>
+      <span>{{ base_url or 'http://127.0.0.1:8766' }}</span>
+    </footer>
+  </div>
+</body>
+</html>
